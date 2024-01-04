@@ -1,0 +1,51 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  margin:0;
+  background-color: #333;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+.container {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.shapes-container {
+  
+  text-align: center;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); /* Három egyforma szélességű oszlop */
+  gap: 10px; /* Távolság az oszlopok között */
+}
+
+.shape{
+  cursor: move;
+}
+
+.main{
+  margin: 50px;
+}
+
+.table {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+  border: 2px dashed #000000;
+  margin: auto;
+}
+
+.table > div {
+  width: 50px; /* Egy cella 5 pixel széles */
+  height: 50px; /* Egy cella 5 pixel magas */
+  border: 1px solid #ccc; /* Szürke keret a cellákhoz */
+  background-color: white;
+}
