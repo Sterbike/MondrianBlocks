@@ -32,7 +32,7 @@ function toggleSpoilerImage() {
     const spoilerImageContainer = document.getElementById('spoilerImageContainer');
     spoilerImageContainer.appendChild(spoilerImage);
 
-    button.textContent = 'Spoiler kép eltüntetése';
+    button.textContent = 'Spoiler eltüntetése';
     isSpoilerShown = true;
   } else {
     spoilerImage.remove();
