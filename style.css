@@ -2,6 +2,8 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
+  background: rgb(238,174,202);
+  background: radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(176,129,149,1) 29%, rgba(154,113,130,1) 52%, rgba(119,87,101,1) 71%, rgba(0,0,0,1) 100%);
 }
 
 h1 {
@@ -10,6 +12,14 @@ h1 {
   color: white;
   padding: 20px;
   text-align: center;
+}
+
+h4, h2 {
+  color: white;
+}
+
+img{
+  width: 100%;
 }
 
 .container {
@@ -23,12 +33,13 @@ h1 {
   width: 100%;
   text-align: center;
   display: grid;
-  grid-template-columns: repeat(5, 1fr); /* Három egyforma szélességű oszlop */
+  grid-template-columns: repeat(6, 1fr); /* Három egyforma szélességű oszlop */
   gap: 15px; /* Távolság az oszlopok között */
 }
 
 .shape{
   cursor: move;
+  border: 1px solid black;
 }
 
 .main{
@@ -48,4 +59,21 @@ h1 {
   height: 50px; /* Egy cella 5 pixel magas */
   border: 1px solid #ccc; /* Szürke keret a cellákhoz */
   background-color: white;
+}
+
+#congratsMessage{
+  text-align: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 25%;
+  font-size: 36px;
+  font-weight: bold;
+  color: rgb(0, 88, 0);
+}
+
+#congratsMessage button {
+  width: 200px;
+  margin: 0;
 }

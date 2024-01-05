@@ -1,33 +1,52 @@
+let currentMap = 1;
+let blockShapeData = [];
+let shapesData = []
+const shapesContainer = document.querySelector('.shapes-container');
 document.addEventListener('DOMContentLoaded', function () {
   generateTableCells();
-  drawLShape();
-  generateSpecificShapes();
-
-  const showSpoilerButton = document.getElementById('showSpoilerButton');
-  showSpoilerButton.addEventListener('click', toggleSpoilerImage);
-
+  loadShapesData(currentMap);
   cells = document.querySelectorAll('.block');
-
   const shapes = document.querySelectorAll('.shape');
   shapes.forEach(shape => {
     shape.addEventListener('dragstart', dragStart);
   });
-
   const table = document.querySelector('.table');
   table.addEventListener('dragover', dragOver);
   table.addEventListener('drop', drop);
 });
 
+const showSpoilerButton = document.getElementById('showSpoilerButton');
+showSpoilerButton.addEventListener('click', toggleSpoilerImage);
+
+
+function loadShapesData(currentMap) {
+      fetch(`/maps/map${currentMap}/blockshape.json`)
+      .then(response => response.json())
+      .then(data => {
+      blockShapeData = data;
+    })
+    .catch(error => console.error('Hiba a Blockshape fájl betöltésekor:', error));
+      fetch(`/maps/map${currentMap}/shapes.json`)
+        .then(response => response.json())
+        .then(data => {
+          shapesData = data;
+          blockShape();
+          generateSpecificShapes();
+        })
+        .catch(error => console.error('Hiba a Shapes fájl betöltésekor:', error));  
+
+}
+
 let isSpoilerShown = false;
-let spoilerImage; 
+let spoilerImage; // Hogy hivatkozhassunk a képre később
 
 function toggleSpoilerImage() {
-  const button = this;
+  const button = this; // A gomb, ami elindította az eseményt
 
   if (!isSpoilerShown) {
     spoilerImage = new Image();
-    spoilerImage.src = './img/Spoiler.PNG';
-    spoilerImage.id = 'spoilerImage'; 
+    spoilerImage.src = `img/Spoiler${currentMap}.png`;
+    spoilerImage.id = 'spoilerImage'; // Adjunk egy azonosítót a képnek, hogy később hivatkozhassunk rá
 
     const spoilerImageContainer = document.getElementById('spoilerImageContainer');
     spoilerImageContainer.appendChild(spoilerImage);
@@ -40,42 +59,26 @@ function toggleSpoilerImage() {
     isSpoilerShown = false;
   }
 }
-let draggedItem; 
+let draggedItem; // A húzott elem tárolására
 
 function dragStart(event) {
   event.dataTransfer.setData('text/plain', event.target.id);
   draggedItem = event.target;
 
-  const offsetXFromMouse = event.offsetX;
-  const offsetYFromMouse = event.offsetY;
+  const offsetXFromMouse = event.clientX - event.target.getBoundingClientRect().left;
+  const offsetYFromMouse = event.clientY - event.target.getBoundingClientRect().top;
 
-  event.dataTransfer.setData('offsetXFromMouse', offsetXFromMouse);
-  event.dataTransfer.setData('offsetYFromMouse', offsetYFromMouse);
+  event.target.dataset.offsetXFromMouse = offsetXFromMouse;
+  event.target.dataset.offsetYFromMouse = offsetYFromMouse;
+
+  console.log('OffsetXFromMouse:', offsetXFromMouse);
+  console.log('OffsetYFromMouse:', offsetYFromMouse);
 }
-
 
 function dragOver(event) {
 
   event.preventDefault();
 }
-
-const shapesData = [
-    
-  { width: 50, height: 200 },  // 1x4 egység
-  { width: 50, height: 300 },  // 1x6 egység
-  { width: 50, height: 250 },  // 1x5 egység
-  { width: 50, height: 250 },  // 1x5 egység
-  { width: 100, height: 250 },  // 1x5 egység
-  { width: 50, height: 50 },   // 1x1 egység
-  { width: 100, height: 100 }, // 2x2 egység
-  { width: 100, height: 150 }, // 2x3 egység
-  { width: 150, height: 200 }, // 3x4 egység
-  { width: 150, height: 150 }, // 3x3 egység
-  { width: 150, height: 150 }, // 3x3 egység
-  { width: 150, height: 150 }, // 3x3 egység
-  { width: 100, height: 200 }, // 2x4 egység
-  { width: 100, height: 200 }  // 2x4 egység
-];
 
 function canPlaceShape(tableCells, touchedCells) {
   for (const index of touchedCells) {
@@ -90,18 +93,17 @@ function rotateShape(event) {
   const clickedElementId = event.target.id;
   const clickedElement = document.getElementById(clickedElementId);
 
-  
   const currentWidth = parseInt(clickedElement.style.width);
   const currentHeight = parseInt(clickedElement.style.height);
 
-  
   clickedElement.style.width = `${currentHeight}px`;
   clickedElement.style.height = `${currentWidth}px`;
 
-  
   clickedElement.dataset.rotatedWidth = `${currentHeight}`;
   clickedElement.dataset.rotatedHeight = `${currentWidth}`;
 }
+
+let droppedItems = [];
 
 function drop(event) {
   event.preventDefault();
@@ -114,18 +116,23 @@ function drop(event) {
   const tableCells = Array.from(document.querySelectorAll('.block'));
   const tableWidth = 10;
 
+  const offsetXFromMouse = parseInt(droppedItem.dataset.offsetXFromMouse || 0) /50;
+  const offsetYFromMouse = parseInt(droppedItem.dataset.offsetYFromMouse || 0) /50;
+  console.log('OffsetXFromMouse:', offsetXFromMouse);
+  console.log('OffsetYFromMouse:', offsetYFromMouse);
+
   const cellId = event.target.id;
   console.log(cellId);
-  const cellX = parseInt(cellId.split('_')[1]) % tableWidth;
-  const cellY = Math.floor(parseInt(cellId.split('_')[1]) / tableWidth);
+  const cellX = Math.floor(parseInt(cellId.split('_')[1]) % tableWidth - offsetXFromMouse +1);
+  const cellY = Math.floor(Math.floor(parseInt(cellId.split('_')[1]) / tableWidth) - offsetYFromMouse +1);
   console.log("Cella X: "+cellX);
   console.log("Cella Y: "+cellY);
 
   const shapeIndex = parseInt(droppedItem.id.split('_')[1]);
   const shapeData = shapesData[shapeIndex];
 
-  const shapeWidth = parseInt(droppedItem.dataset.rotatedWidth || shapeData.width) / 50; 
-  const shapeHeight = parseInt(droppedItem.dataset.rotatedHeight || shapeData.height) / 50;
+  const shapeWidth = parseInt(droppedItem.dataset.rotatedWidth || shapeData.width) / 50; // Az elforgatott alakzat szélessége cellákban
+  const shapeHeight = parseInt(droppedItem.dataset.rotatedHeight || shapeData.height) / 50; // Az elforgatott alakzat magassága cellákban
 
 
 
@@ -162,43 +169,102 @@ function drop(event) {
     }
   });
 
+  const placedItem = {
+    element: droppedItem,
+    cellIndexes: Array.from(touchedCells)
+  };
+
+  droppedItems.push(placedItem);
+
   droppedItem.remove();
   if (checkAllShapesPlaced()) {
-    setTimeout(function() {
-      alert('Gratulálok, minden alakzatot elhelyeztél!');
-    }, 500);
+    congratulationsMessage();
+    
   }
+}
+
+function Reset(){
+  while (droppedItems.length !== 0) {
+    undoLastPlacement();
+  }
+}
+const resetButton = document.getElementById('resetButton')
+resetButton.addEventListener('click', Reset);
+
+function undoLastPlacement() {
+  const lastPlacedItem = droppedItems.pop();
+  if (lastPlacedItem) {
+    const { element, cellIndexes } = lastPlacedItem;
+    const tableCells = document.querySelectorAll('.block');
+    cellIndexes.forEach(index => {
+      tableCells[index].style.backgroundColor = '';
+    });
+    shapesContainer.appendChild(element);
+  }
+}
+
+// A gombhoz hozzárendeljük az undoLastPlacement függvényt
+const undoButton = document.getElementById('undoButton');
+undoButton.addEventListener('click', undoLastPlacement);
+
+function resetTableBackground() {
+  const tableCells = document.querySelectorAll('.block');
+  tableCells.forEach(cell => {
+    cell.style.backgroundColor = ''; // Visszaállítás alapértelmezettre
+  });
+}
+
+function congratulationsMessage() {
+  const congratsMessage = document.createElement('div');
+  congratsMessage.style.gridColumn = 'span 6';
+  congratsMessage.id = 'congratsMessage';
+  if (currentMap == 3) {
+    congratsMessage.textContent = 'Gratulálok, végigvitted a játékot!';
+    shapesContainer.appendChild(congratsMessage);
+  } else{
+    congratsMessage.textContent = `Gratulálok, teljesítetted a(z) ${currentMap}. pályát!`;
+    const nextMapButton = document.createElement('button');
+    nextMapButton.textContent = 'Következő pálya betöltése';
+    nextMapButton.addEventListener('click', () => {
+      currentMap++;
+      droppedItems=[];
+      const stageLabel = document.getElementById('stageLabel')
+      stageLabel.innerHTML = currentMap + ". Pálya"
+      resetTableBackground();
+      loadShapesData(currentMap); // Új pálya betöltése
+      congratsMessage.remove(); // Üzenet eltávolítása
+      nextMapButton.remove(); // Gomb eltávolítása
+    });
+    shapesContainer.appendChild(congratsMessage);
+    congratsMessage.appendChild(nextMapButton);
+  }
+
+  
 }
 
 function generateTableCells() {
   const table = document.querySelector('.table');
   table.addEventListener('dragover', dragOver);
   table.addEventListener('drop', drop);
-  for (let i = 0; i < 100; i++) { 
+  for (let i = 0; i < 100; i++) { // 10x10 = 100 cella
     const cell = document.createElement('div');
     cell.classList.add('block');
-    cell.setAttribute('id', 'block_' + i); 
+    cell.setAttribute('id', 'block_' + i); // Adj hozzá egyedi azonosítót
     table.appendChild(cell);
   }
 }
 
-function drawLShape() {
+function blockShape() {
   const table = document.querySelector('.table');
   const cells = table.querySelectorAll('.block');
 
-  const lShapeCoordinates = [
-    { x: 4, y: 5 },
-    { x: 4, y: 4 },
-    { x: 4, y: 3 },
-    { x: 5, y: 3 }
-  ];
+  const tableWidth = 10; // A táblázat szélessége 10 kocka szélességű
 
-  const tableWidth = 10; 
-
-  lShapeCoordinates.forEach(coord => {
+  blockShapeData.forEach(coord => {
     const index = coord.x + coord.y * tableWidth;
+    console.log(index); // A kocka pozíciója az egydimenziós tömbben
     if (index < cells.length) {
-      cells[index].style.backgroundColor = 'black'; 
+      cells[index].style.backgroundColor = 'black'; // A kocka színének feketére állítása
     }
   });
 }
@@ -213,7 +279,7 @@ function generateRandomColor() {
     for (let i = 0; i < 6; i++) {
       color += letters[Math.floor(Math.random() * 16)];
     }
- 
+    // Ellenőrzi, hogy ne legyen fekete vagy fehér
     isBlackOrWhite = color === '#000000' || color === '#FFFFFF';
   }
   return color;
@@ -223,22 +289,21 @@ function checkAllShapesPlaced() {
   const tableCells = document.querySelectorAll('.block');
   for (const cell of tableCells) {
     if (!cell.style.backgroundColor) {
-      return false; 
+      return false; // Ha talál olyan cellát, aminek nincs színe, azaz nincs alak rajta
     }
   }
-  return true; 
+  return true; // Ha minden cellán van szín, azaz minden alakot elhelyeztünk
 }
 
 function generateSpecificShapes() {
-  const shapesContainer = document.querySelector('.shapes-container');
   shapesData.sort(() => Math.random() - 0.5);
 
-  const usedColors = new Set(); 
+  const usedColors = new Set(); // Tartalmazza az eddig használt színeket
 
   shapesData.forEach((shapeData, index) => {
     const shape = document.createElement('div');
     shape.classList.add('shape');
-    shape.setAttribute('id', 'shape_' + index);
+    shape.setAttribute('id', 'shape_' + index); // Adj hozzá egyedi azonosítót
     shape.style.width = shapeData.width + 'px';
     shape.style.height = shapeData.height + 'px';
 
