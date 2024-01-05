@@ -20,13 +20,13 @@ showSpoilerButton.addEventListener('click', toggleSpoilerImage);
 
 
 function loadShapesData(currentMap) {
-      fetch(`/maps/map${currentMap}/blockshape.json`)
+      fetch(`maps/map${currentMap}/blockshape.json`)
       .then(response => response.json())
       .then(data => {
       blockShapeData = data;
     })
     .catch(error => console.error('Hiba a Blockshape fájl betöltésekor:', error));
-      fetch(`/maps/map${currentMap}/shapes.json`)
+      fetch(`maps/map${currentMap}/shapes.json`)
         .then(response => response.json())
         .then(data => {
           shapesData = data;
