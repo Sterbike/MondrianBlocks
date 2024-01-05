@@ -20,11 +20,11 @@ h1 {
 }
 
 .shapes-container {
-  
+  width: 100%;
   text-align: center;
   display: grid;
-  grid-template-columns: repeat(6, 1fr); /* Három egyforma szélességű oszlop */
-  gap: 10px; /* Távolság az oszlopok között */
+  grid-template-columns: repeat(5, 1fr); /* Három egyforma szélességű oszlop */
+  gap: 15px; /* Távolság az oszlopok között */
 }
 
 .shape{
