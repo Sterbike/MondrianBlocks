@@ -36,7 +36,7 @@ function toggleSpoilerImage() {
     isSpoilerShown = true;
   } else {
     spoilerImage.remove();
-    button.textContent = 'Spoiler kép megjelenítése';
+    button.textContent = 'Spoiler megjelenítése';
     isSpoilerShown = false;
   }
 }
