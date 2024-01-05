@@ -26,7 +26,7 @@ function toggleSpoilerImage() {
 
   if (!isSpoilerShown) {
     spoilerImage = new Image();
-    spoilerImage.src = './img/Spoiler.png';
+    spoilerImage.src = './img/Spoiler.PNG';
     spoilerImage.id = 'spoilerImage'; 
 
     const spoilerImageContainer = document.getElementById('spoilerImageContainer');
