@@ -45,7 +45,7 @@ function toggleSpoilerImage() {
 
   if (!isSpoilerShown) {
     spoilerImage = new Image();
-    spoilerImage.src = `img/Spoiler${currentMap}.png`;
+    spoilerImage.src = `img/Spoiler${currentMap}.PNG`;
     spoilerImage.id = 'spoilerImage'; // Adjunk egy azonosítót a képnek, hogy később hivatkozhassunk rá
 
     const spoilerImageContainer = document.getElementById('spoilerImageContainer');
